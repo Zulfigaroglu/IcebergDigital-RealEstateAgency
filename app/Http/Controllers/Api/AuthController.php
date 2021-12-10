@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
         $userData = $request->all();
         $userData['password'] = bcrypt($request->password);
@@ -19,7 +21,7 @@ class AuthController extends Controller
         return response([ 'user' => $user, 'access_token' => $accessToken]);
     }
 
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
         $loginData = $request->all();
 
