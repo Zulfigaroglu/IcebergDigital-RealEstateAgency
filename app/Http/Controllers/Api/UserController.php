@@ -3,43 +3,47 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use App\Http\Requests\UpdateUserRequest;
+use App\Repositories\UserRepository;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    /**
+     * @var UserRepository
+     */
+    protected $userRepository;
+
+    public function __construct(UserRepository $userRepository)
+    {
+        $this->userRepository = $userRepository;
+    }
+
     public function index()
     {
-        return response()->json(User::query()->get());
+        return response()->json($this->userRepository->all());
     }
 
-    public function show($id)
+    public function show($id): JsonResponse
     {
-        $user = User::query()->findOrFail($id);
+        $user = $this->userRepository->getById($id);
         return response()->json($user);
     }
 
-    public function update(UpdateUserRequest $request, $id)
+    public function update(UpdateUserRequest $request, $id): JsonResponse
     {
-        $userData = $request->toArray();
-        if ($request->has('password')) {
-            $userData['password'] = Hash::make($request->get('password'));
-        }
-
-        $user = User::query()->findOrFail($id);
-        $user->update($userData);
+        $user = $this->userRepository->update($request->all(), $id);
         return response()->json($user);
     }
 
-    public function destroy($id)
+    public function destroy($id): JsonResponse
     {
-        $user = User::query()->findOrFail($id)->delete();
+        $user = $this->userRepository->delete($id);
         return response()->json($user);
     }
 
-    public function me()
+    public function me(): JsonResponse
     {
         return response()->json(Auth::user());
     }

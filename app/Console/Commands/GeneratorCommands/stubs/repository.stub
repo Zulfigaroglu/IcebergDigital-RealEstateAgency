@@ -1,0 +1,79 @@
+<?php
+
+namespace App\Repositories;
+
+use App\Repositories\Infrastructure\IRepository;
+use App\Repositories\Infrastructure\Repository;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use App\Models\{{Model}};
+
+class {{class}} extends Repository implements IRepository
+{
+    protected $model;
+
+    public function __construct({{Model}} $model)
+    {
+        $this->model = $model;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function all(): Collection
+    {
+        return User::query()->get();
+    }
+
+    /**
+     * @param $id
+     * @return {{Model}}
+     */
+    public function getById($id): {{Model}}
+    {
+        return User::query()->findOrFail($id);
+    }
+
+    /**
+     * @param array $attributes
+     * @return {{Model}}
+     */
+    public function create(array $attributes): {{Model}}
+    {
+        ${{model}}Data = Arr::only($attributes, $this->getFillable());
+        ${{model}} = {{Model}}::create(${{model}}Data);
+        return ${{model}};
+    }
+
+    /**
+     * @param array $attributes
+     * @param $id
+     * @return {{Model}}
+     */
+    public function update(array $attributes, $id): {{Model}}
+    {
+        ${{model}}Data = Arr::only($attributes, $this->getFillable());
+        ${{model}} = $this->getById($id);
+        ${{model}}->update(${{model}}Data);
+        return ${{model}};
+    }
+
+    /**
+     * @param $id
+     * @return {{Model}}
+     */
+    public function delete($id): {{Model}}
+    {
+        ${{model}} = $this->getById($id);
+        ${{model}}->delete();
+        return ${{model}};
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getFillable(): array
+    {
+        return $this->model->getFillable();
+    }
+}

@@ -6,39 +6,54 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
+use App\Repositories\UserRepository;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    public function register(RegisterRequest $request)
+    /**
+     * @var UserRepository
+     */
+    protected $userRepository;
+
+    public function __construct(UserRepository $userRepository)
     {
-        $userData = $request->all();
-        $userData['password'] = bcrypt($request->password);
-
-        $user = User::create($userData);
-        $accessToken = $user->createToken('authToken')->accessToken;
-
-        return response([ 'user' => $user, 'access_token' => $accessToken]);
+        $this->userRepository = $userRepository;
     }
 
-    public function login(LoginRequest $request)
+    public function register(RegisterRequest $request): JsonResponse
     {
-        $loginData = $request->all();
+        $user = $this->userRepository->create($request->all());
+        $accessToken = $this->userRepository->generateToken($user);
 
-        if (!auth()->attempt($loginData)) {
-            return response(['message' => 'Invalid Credentials']);
+        return response()->json([ 'user' => $user, 'access_token' => $accessToken]);
+    }
+
+    public function login(LoginRequest $request): JsonResponse
+    {
+        if (!Auth::attempt($request->all())) {
+            return response()->json(['message' => 'Invalid Credentials']);
         }
 
-        $accessToken = auth()->user()->createToken('authToken')->accessToken;
+        /**
+         * @var User $user
+         */
+        $user = Auth::user();
+        $accessToken = $this->userRepository->generateToken($user);
 
-        return response(['user' => auth()->user(), 'access_token' => $accessToken]);
+        return response()->json(['user' => Auth::user(), 'access_token' => $accessToken]);
 
     }
 
-    public function logout (Request $request) {
-        $token = $request->user()->token();
-        $token->revoke();
-        $response = ['message' => 'You have been successfully logged out!'];
-        return response($response, 200);
+    public function logout (): JsonResponse
+    {
+        /**
+         * @var User $user
+         */
+        $user = Auth::user();
+        $user->token()->revoke();
+
+        return response()->json(['message' => 'You have been successfully logged out!']);
     }
 }
