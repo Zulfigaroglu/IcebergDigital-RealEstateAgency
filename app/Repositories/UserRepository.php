@@ -18,27 +18,16 @@ class UserRepository extends Repository implements IRepository
         $this->model = $model;
     }
 
-    /**
-     * @return Collection
-     */
     public function all(): Collection
     {
         return User::query()->get();
     }
 
-    /**
-     * @param $id
-     * @return User
-     */
     public function getById($id): User
     {
         return User::query()->findOrFail($id);
     }
 
-    /**
-     * @param array $attributes
-     * @return User
-     */
     public function create(array $attributes): User
     {
         $userData = Arr::only($attributes, $this->getFillable());
@@ -47,11 +36,6 @@ class UserRepository extends Repository implements IRepository
         return $user;
     }
 
-    /**
-     * @param array $attributes
-     * @param $id
-     * @return User
-     */
     public function update(array $attributes, $id): User
     {
         $userData = Arr::only($attributes, $this->getFillable());
@@ -60,10 +44,6 @@ class UserRepository extends Repository implements IRepository
         return $user;
     }
 
-    /**
-     * @param $id
-     * @return User
-     */
     public function delete($id): User
     {
         $user = $this->getById($id);
@@ -71,22 +51,15 @@ class UserRepository extends Repository implements IRepository
         return $user;
     }
 
-    /**
-     * @return string[]
-     */
     public function getFillable(): array
     {
         return $this->model->getFillable();
     }
 
-    /**
-     * @param User $user
-     * @return string
-     */
     public function generateToken(User $user): string
     {
         $activeToken = $user->token();
-        if($activeToken){
+        if ($activeToken) {
             $activeToken->revoke();
         }
 
