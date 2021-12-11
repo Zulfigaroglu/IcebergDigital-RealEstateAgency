@@ -21,7 +21,7 @@ Route::group(['namespace' => 'Api'], function () {
         Route::post('/logout', 'AuthController@logout')->name('auth.logout');
 
 
-        Route::resource('user', 'UserController')
+        Route::resource('users', 'UserController')
             ->only(['index', 'show', 'update', 'destroy'])->names('user');
     });
 });
