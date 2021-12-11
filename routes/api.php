@@ -23,5 +23,7 @@ Route::group(['namespace' => 'Api'], function () {
 
         Route::resource('users', 'UserController')
             ->only(['index', 'show', 'update', 'destroy'])->names('user');
+
+        Route::resource('appointments', 'AppointmentController')->names('appointment');
     });
 });
